@@ -94,7 +94,7 @@ const addEmployee = () => {
       const managers = res.map(({ id, name }) => ({
         name,
         value: id,
-      }));
+      }))
 
       inquirer.prompt([
         {
@@ -138,7 +138,46 @@ const addEmployee = () => {
   });
 };
 
-
+const updateEmployeeRole = () => {
+  db.query('SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role ON employee.role_id = role.id', (err, employees) => {
+    if (err) {
+      console.error(err);
+      return;
+    };
+    db.query('SELECT * FROM role', (err, roles) => {
+      if (err) {
+        console.error(err);
+        return;
+      };
+      inquirer.prompt([
+        {
+          type: 'list',
+          name: 'employee',
+          message: "Which employee's role would you like to update?",
+          choices: employees.map((employee) => `${employee.first_name} ${employee.last_name}`),
+        },
+        {
+          type: 'list',
+          name: 'role',
+          message: 'Select new role:',
+          choices: roles.map((role) => role.title),
+        },
+      ])
+      .then((userInput) => {
+        const employee = employees.find((employee) => `${employee.first_name} ${employee.last_name}` === userInput.employee);
+        const role = roles.find((role) => role.title === userInput.role);
+        const query = 'UPDATE employee SET role_id = ? WHERE id = ?';
+        db.query(query, [role.id, employee.id], (err, res) => {
+          if (err) {
+            console.error(err);
+            return;
+          };
+          console.log('Successfully updated!');
+        });
+      })
+    })
+  })
+};
 
 const innit = () => {
   inquirer.prompt(questions).then(userInput);
