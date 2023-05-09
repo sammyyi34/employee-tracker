@@ -14,8 +14,7 @@ db.connect((err) => {
   if (err) {
     console.error(err);
     return;
-  }
-  console.log('Successful connection to database!');
+  };
 });
 
 const questions = [
@@ -137,8 +136,7 @@ const addEmployee = () => {
           if (err) {
             console.error(err);
             return;
-          }
-          console.log('Successfully updated!');
+          };
           db.query('SELECT * FROM employee', (err, updatedEmployee) => {
             if (err) {
               console.error(err);
@@ -192,8 +190,7 @@ const updateEmployeeRole = () => {
           if (err) {
             console.error(err);
             return;
-          };
-          console.log('Successfully updated!');
+          }
           db.query('SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role ON employee.role_id = role.id', (err, updatedEmployee) => {
             if (err) {
               console.error(err);
@@ -257,8 +254,7 @@ const addRole = () => {
           if (err) {
             console.error(err);
             return;
-          }
-          console.log('Successfully updated!');
+          };
           db.query('SELECT * FROM role', (err, res) => {
             if (err) {
               console.error(err);
@@ -274,12 +270,41 @@ const addRole = () => {
 };
 
 const viewAllDepartments = () => {
-
+  db.query('SELECT * FROM department', (err, res) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.table(res);
+    innit();
+  });
 };
 
 const addDepartment = () => {
-  
+  inquirer.prompt({
+    type: 'input',
+    name: 'name',
+    message: "What is the name of the new department?",
+  })
+  .then((userInput) => {
+    const query = 'INSERT INTO department (name) VALUES (?)';
+    db.query(query, [userInput.name], (err, res) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      db.query('SELECT * FROM department', (err, res) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        console.table(res);
+        innit();
+      });
+    });
+  });
 };
+
 
 const innit = () => {
   inquirer.prompt(questions).then(userInput);
