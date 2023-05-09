@@ -1,14 +1,7 @@
 const inquirer = require('inquirer');
-const express = require('express');
-const mysql = require('mysql2');
-require('console.table');
+const mysql = require('mysql');
 require('dotenv').config();
 
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 
 const db = mysql.createConnection({
   user: process.env.DB_USER,
@@ -34,7 +27,7 @@ const questions = [
   }
 ];
 
-function handleUserInput(answer) {
+const handleUserInput = (answer) => {
   switch(answer.promptChoices) {
     case 'View All Employees':
       viewAllEmployees();
@@ -62,3 +55,24 @@ function handleUserInput(answer) {
       break;
   }
 };
+
+const viewAllEmployees = () => {
+  const query = 'SELECT * FROM employee';
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+
+    console.table(res);
+
+    promptUser();
+  });
+}
+
+
+
+
+const innit = () => {
+  inquirer.prompt(questions).then(handleUserInput);
+};
+
+// start the program
+innit();
