@@ -219,6 +219,68 @@ const viewAllRoles = () => {
   });
 };
 
+const addRole = () => {
+  db.query('SELECT * FROM department', (err, res) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    const departmentChoice = res.map((department) => department.name)
+    inquirer.prompt([
+      {
+        type: 'input',
+        name: 'title',
+        message: "What is title of the new role?",
+      },
+      {
+        type: 'input',
+        name: 'salary',
+        message: "What is the salary of the new role?",
+      },
+      {
+        type: 'list',
+        name: 'department',
+        message: "What is the department for the new role?",
+        choices: departmentChoice,
+      },
+    ])
+    .then((userInput) => {
+      const department = res.find((department) => department.name === userInput.department);
+      db.query(
+        'INSERT INTO role SET ?',
+        {
+          title: userInput.title,
+          salary: userInput.salary,
+          department_id: department.id,
+        },
+        (err, res) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          console.log('Successfully updated!');
+          db.query('SELECT * FROM role', (err, res) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+            console.table(res);
+            innit();
+          });
+        }
+      );
+    });
+  });
+};
+
+const viewAllDepartments = () => {
+
+};
+
+const addDepartment = () => {
+  
+};
+
 const innit = () => {
   inquirer.prompt(questions).then(userInput);
 };
