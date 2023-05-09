@@ -10,6 +10,14 @@ const db = mysql.createConnection({
   host: 'localhost'
 });
 
+db.connect((err) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  console.log('Successful connection to database!');
+});
+
 const questions = [
   {
     type: 'list',
@@ -130,8 +138,15 @@ const addEmployee = () => {
             console.error(err);
             return;
           }
-          console.table(res);
-          innit();
+          console.log('Successfully updated!');
+          db.query('SELECT * FROM employee', (err, updatedEmployee) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+            console.table(updatedEmployee);
+            innit();
+          });
         });
       });
     })
@@ -149,34 +164,59 @@ const updateEmployeeRole = () => {
         console.error(err);
         return;
       };
+      const employeeChoices = employees.map((employee) => ({
+        name: `${employee.first_name} ${employee.last_name}`,
+        value: employee.id,
+      }));
+      const roleChoices = roles.map((role) => ({
+        name: role.title,
+        value: role.id,
+      }));
       inquirer.prompt([
         {
           type: 'list',
           name: 'employee',
           message: "Which employee's role would you like to update?",
-          choices: employees.map((employee) => `${employee.first_name} ${employee.last_name}`),
+          choices: employeeChoices,
         },
         {
           type: 'list',
           name: 'role',
           message: 'Select new role:',
-          choices: roles.map((role) => role.title),
+          choices: roleChoices,
         },
       ])
       .then((userInput) => {
-        const employee = employees.find((employee) => `${employee.first_name} ${employee.last_name}` === userInput.employee);
-        const role = roles.find((role) => role.title === userInput.role);
         const query = 'UPDATE employee SET role_id = ? WHERE id = ?';
-        db.query(query, [role.id, employee.id], (err, res) => {
+        db.query(query, [userInput.role, userInput.employee], (err, res) => {
           if (err) {
             console.error(err);
             return;
           };
           console.log('Successfully updated!');
+          db.query('SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role ON employee.role_id = role.id', (err, updatedEmployee) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+            console.table(updatedEmployee);
+            innit();
+          });
         });
       })
     })
   })
+};
+
+const viewAllRoles = () => {
+  db.query('SELECT role.title, role.id, department.name, role.salary FROM role LEFT JOIN department ON role.department_id = department.id', (err, res) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.table(res);
+    innit();
+  });
 };
 
 const innit = () => {
@@ -185,3 +225,8 @@ const innit = () => {
 
 // start the program
 innit();
+
+// stops the connection when exiting 
+process.on('exit', () => {
+  db.end();
+});
