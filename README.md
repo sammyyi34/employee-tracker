@@ -1,5 +1,5 @@
 # Employee Tracker
-https://github.com/sammyyi34/Employee Tracker
+https://github.com/sammyyi34/Employee
 # Description
 This is an employee management command-line application that uses Node.js and MySQL to manage a company's employees. Users can view all employees and their corresponding information, such as job title, salary, department, and manager. They can also view all roles and departments, add new roles and departments, and add new employees by providing their basic information and assigning them a role.
 # Table of Contents
