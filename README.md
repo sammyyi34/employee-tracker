@@ -10,9 +10,9 @@ This is an employee management command-line application that uses Node.js and My
 * [Tests](#tests)
 * [Questions](#questions)
 # Installation
-To install necessary dependencies, run the following command: This app uses node.js, inquirer, mysql2 and dotenv. Run npm i to install the dependencies.
+To install necessary dependencies, run the following command: This app uses node.js, inquirer and mysql2. Run npm i to install the dependencies.
 # Usage
-To use this app, Run node server.js to initiate the prompt.
+To use this app, FIRST you must add your MySQL password (if you have one) into the empty string on line 7 in the server.js file. Then run node server.js to initiate the prompt.
 # License
 This project is licensed under the [MIT License](https://img.shields.io/badge/License-MIT-yellow.svg). https://opensource.org/licenses/MIT
 # Contributing
