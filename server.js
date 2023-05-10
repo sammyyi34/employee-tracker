@@ -2,7 +2,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 require('dotenv').config();
 
-
+// creates a mysql database connection
 const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -10,6 +10,7 @@ const db = mysql.createConnection({
   host: 'localhost'
 });
 
+// connects to the database
 db.connect((err) => {
   if (err) {
     console.error(err);
@@ -17,6 +18,7 @@ db.connect((err) => {
   };
 });
 
+// initial prompt choices
 const questions = [
   {
     type: 'list',
@@ -34,6 +36,7 @@ const questions = [
   }
 ];
 
+// takes the user input and uses switch statements to call the appropriate function
 const userInput = (answer) => {
   switch(answer.promptChoices) {
     case 'View All Employees':
@@ -63,6 +66,7 @@ const userInput = (answer) => {
   }
 };
 
+// gets all employee data by their job title, department, salary, and manager-
 const viewAllEmployees = () => {
   const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title AS job_title, department.name AS department, role.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager_name
   FROM employee
@@ -80,6 +84,7 @@ const viewAllEmployees = () => {
   });
 };
 
+// lets you add a new employee along with their name, role and manager
 const addEmployee = () => {
   db.query('SELECT id, title FROM role', (err, res) => {
     if (err) {
@@ -151,6 +156,7 @@ const addEmployee = () => {
   });
 };
 
+// lets you update an employee's role
 const updateEmployeeRole = () => {
   db.query('SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role ON employee.role_id = role.id', (err, employees) => {
     if (err) {
@@ -205,6 +211,7 @@ const updateEmployeeRole = () => {
   })
 };
 
+// gets all role data by their title, id, department name, and salary
 const viewAllRoles = () => {
   db.query('SELECT role.title, role.id, department.name, role.salary FROM role LEFT JOIN department ON role.department_id = department.id', (err, res) => {
     if (err) {
@@ -216,6 +223,7 @@ const viewAllRoles = () => {
   });
 };
 
+// lets you add a new role to an exisitng employee
 const addRole = () => {
   db.query('SELECT * FROM department', (err, res) => {
     if (err) {
@@ -269,6 +277,7 @@ const addRole = () => {
   });
 };
 
+// gets all department data
 const viewAllDepartments = () => {
   db.query('SELECT * FROM department', (err, res) => {
     if (err) {
@@ -280,6 +289,7 @@ const viewAllDepartments = () => {
   });
 };
 
+// lets you add a new department
 const addDepartment = () => {
   inquirer.prompt({
     type: 'input',
@@ -305,7 +315,7 @@ const addDepartment = () => {
   });
 };
 
-
+// creates the prompt using inquirer
 const innit = () => {
   inquirer.prompt(questions).then(userInput);
 };
